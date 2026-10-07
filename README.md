@@ -20,7 +20,9 @@ These checks cover the website only. They are not Evaltra engine or Excel compat
 
 GitHub Pages publishes `dist/` when changes reach `main`. The workflow runs the checks before deployment. Repository Settings → Pages → Source must be **GitHub Actions**.
 
-Site: https://oguzhankkaraca.github.io/evaltra-website/
+Site: https://evaltra.ai/
+
+The custom domain is managed in GitHub Pages settings, with GoDaddy DNS pointing to GitHub Pages. `www.evaltra.ai` redirects to the main domain and HTTPS is enforced. The original GitHub Pages URL redirects to the custom domain.
 
 Edit the files in `dist/`, run the checks, and push to `main`. Public GitHub Pages hosting and standard GitHub Actions runners for this public repository use GitHub's free offering, subject to its limits.
 
