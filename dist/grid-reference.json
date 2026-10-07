@@ -1,0 +1,60 @@
+{
+  "capturedAt": "2026-09-28T22:02:30.506Z",
+  "excel": {
+    "version": "16.0",
+    "build": 20326,
+    "iteration": false,
+    "capturedAt": "2026-09-28T22:01:10.4968413Z"
+  },
+  "scope": "These fixtures only. Other engines represents a tested static-dependency engine, not every engine. Reference results are recorded, not live services.",
+  "cases": {
+    "sumif": {
+      "cells": {
+        "B4": {
+          "formula": "1",
+          "excel": 1,
+          "other": 1
+        },
+        "B5": {
+          "formula": "0",
+          "excel": 0,
+          "other": 0
+        },
+        "C4": {
+          "formula": "7",
+          "excel": 7,
+          "other": 7
+        },
+        "C5": {
+          "formula": "=A4",
+          "excel": 7,
+          "other": "#CYCLE!"
+        },
+        "A4": {
+          "formula": "=SUMIF(B4:B5,1,C4:C5)",
+          "excel": 7,
+          "other": "#CYCLE!"
+        }
+      }
+    },
+    "if": {
+      "cells": {
+        "A1": {
+          "formula": "0",
+          "excel": 0,
+          "other": 0
+        },
+        "C1": {
+          "formula": "=B1+1",
+          "excel": 43,
+          "other": "#CYCLE!"
+        },
+        "B1": {
+          "formula": "=IF(A1,B1,42)",
+          "excel": 42,
+          "other": "#CYCLE!"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# Publish only the reviewed static website and its support files.
+/*
+!/.gitignore
+!/README.md
+!/package.json
+!/dist/
+!/scripts/
+/scripts/*
+!/scripts/serve-static.mjs
+!/scripts/verify-static.mjs
+!/.github/
