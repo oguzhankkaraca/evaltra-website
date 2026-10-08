@@ -1,171 +1,108 @@
 import './proof.js';
-import { calculateDemo } from './demo-data.js';
+import {workbooks,getWorkbookState,formatCell} from './demo-data.js';
 const $ = selector => document.querySelector(selector);
-const money = n => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
-const compact = n => new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
-const format = n => new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 }).format(n);
-const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-let selected = 'revenue';
-let currentRequest;
-let sequence = 0;
-const cache = new Map();
-const defaults = { revenue: { customers: 1200, price: 49, growth: 8, costs: 18000 }, sales: { region: 'North', minimum: 5000 }, formula: { a: 120, b: 45, c: 10, formula: '=SUM(A1:C1)' } };
-const names = { revenue: 'REVENUE OVERVIEW', sales: 'SALES OVERVIEW', formula: 'FORMULA RESULT' };
+const escape = value => String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const letters = ['A','B','C','D'];
+let kind='estimate', snapshotIndex=0, sheetName='Estimate', selected='D9';
+const current=()=>getWorkbookState(kind,snapshotIndex);
+const sheet=()=>current().sheets.find(item=>item.name===sheetName);
+const address=(row,col)=>letters[col]+(row+1);
 
-function metric(label, value) { return `<div><span>${escape(label)}</span><strong>${escape(value)}</strong></div>`; }
-function table(headers, rows) { return `<table><thead><tr>${headers.map(h => `<th scope="col">${escape(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(v => `<td>${escape(v)}</td>`).join('')}</tr>`).join('')}</tbody></table>`; }
-function chart(labels, values) {
-  const max = Math.max(...values, 1);
-  $('#chart').className = 'chart';
-  $('#chart').innerHTML = values.map((v, i) => `<div class="bar-group"><span class="bar-value">$${compact(v)}</span><div class="bar" style="height:${Math.max(v / max * 80, 1)}%" role="img" aria-label="${escape(labels[i])}: ${money(v)}"></div><span class="bar-label">${escape(labels[i])}</span></div>`).join('');
+function announce(message){$('#model-announcement').textContent=message;}
+function makeChoices(){
+  const book=workbooks[kind];
+  $('#model-scenarios').innerHTML=book.snapshots.map((state,index)=>'<button data-snapshot="'+index+'" aria-pressed="'+(index===snapshotIndex)+'">'+escape(state.label)+'</button>').join('');
+  $('#model-sheets').innerHTML=current().sheets.map(item=>'<button data-sheet="'+item.name+'" aria-pressed="'+(item.name===sheetName)+'">'+item.name+'</button>').join('');
 }
-
-function render(kind, data) {
-  $('#error-message').hidden = true;
-  $('#output-title').textContent = names[kind];
-  if (kind === 'revenue') {
-    $('#metrics').innerHTML = metric('6-month revenue', money(data.revenue)) + metric('6-month profit', money(data.profit));
-    chart(data.rows.map(r => r.month), data.rows.map(r => r.revenue));
-    $('#chart').setAttribute('aria-label', 'Illustrative monthly revenue from January to June');
-    $('#results-table').innerHTML = table(['Month', 'Customers', 'Revenue', 'Profit'], data.rows.map(r => [r.month, format(r.customers), money(r.revenue), money(r.profit)]));
-  } else if (kind === 'sales') {
-    $('#metrics').innerHTML = metric('Matching sales', money(data.total)) + metric('Orders matched', format(data.rows.length));
-    chart(data.regions, data.totals);
-    $('#chart').setAttribute('aria-label', 'Sample total sales by region, all orders');
-    $('#results-table').innerHTML = table(['Region', 'Product', 'Matching sale'], data.rows.map(([region, product, amount]) => [region, product, money(amount)])) + `<p class="table-note">Chart: all sample orders by region. Table: your filtered results.${!data.rows.length ? ' No orders match these filters.' : ''}</p>`;
-  } else {
-    $('#metrics').innerHTML = metric('Result type', data.type) + metric('Execution', 'Sample demo');
-    $('#chart').className = 'chart formula-panel-chart';
-    $('#chart').setAttribute('aria-label', 'Example formula result');
-    $('#chart').innerHTML = `<div class="formula-result"><small>${escape(data.input.formula)}</small><span class="${data.type === 'error' ? 'formula-error' : ''}">${escape(data.type === 'number' ? format(data.value) : data.value)}</span></div>`;
-    $('#results-table').innerHTML = table(['Input cell', 'Value'], ['a', 'b', 'c'].map((key, i) => [['A1', 'B1', 'C1'][i], format(data.input[key])]));
-  }
-  $('#calculation-status').textContent = 'Illustrative result · runs in your browser';
-  currentRequest = {example: kind, inputs: data.input};
-  $('#request-code').textContent = JSON.stringify(currentRequest, null, 2);
-  $('#request-toggle').disabled = false;
+function renderTable(){
+  const active=sheet(),rows=Math.max(11,active.rows.length);
+  $('#model-table').innerHTML='<caption class="sr-only">'+escape(workbooks[kind].title+' — '+sheetName)+'</caption><colgroup><col><col><col><col><col></colgroup><thead><tr><th aria-label="Row"></th>'+letters.map(letter=>'<th scope="col">'+letter+'</th>').join('')+'</tr></thead><tbody>'+
+    Array.from({length:rows},(_,ri)=>{
+      const row=active.rows[ri]||[];
+      const heading=ri===0||(row.length>=3&&row.every(cell=>typeof cell.value==='string'&&cell.value!==''&&!cell.formula));
+      const total=['Project total','Matching revenue'].includes(row[0]?.value);
+      return '<tr class="'+(heading?'sheet-heading':total?'sheet-total':'')+'"><th scope="row">'+(ri+1)+'</th>'+letters.map((letter,ci)=>{
+        const cell=row[ci]||{value:'',formula:''},label=address(ri,ci),display=formatCell(cell);
+        return '<td><button class="cell-button '+(typeof cell.value==='number'?'numeric ':'')+(cell.formula?'formula-cell':'')+'" data-cell="'+label+'" data-row="'+ri+'" data-col="'+ci+'" tabindex="'+(label===selected?0:-1)+'" data-selected="'+(label===selected)+'" aria-label="'+escape(sheetName+' '+label+', '+(display||'empty')+(cell.formula?', formula '+cell.formula:''))+'">'+escape(display||'\u00a0')+'</button></td>';
+      }).join('')+'</tr>';
+    }).join('')+'</tbody>';
+  selectCell(selected);
 }
-
-function clearResults(message = 'Choose an example…') {
-  $('#error-message').hidden = true;
-  $('#metrics').innerHTML = metric('Result', '—') + metric('Execution', '—');
-  $('#chart').className = 'chart';
-  $('#chart').setAttribute('aria-label', 'Example result');
-  $('#chart').innerHTML = `<span class="empty-state">${escape(message)}</span>`;
-  $('#results-table').innerHTML = '';
-  $('#request-code').hidden = true;
-  $('#request-code').textContent = '';
-  $('#request-toggle').setAttribute('aria-expanded', 'false');
-  $('#request-toggle').disabled = true;
-  currentRequest = undefined;
-}
-
-function connection(ok, message) {
-  $('#api-status').textContent = message || (ok ? 'Sample demo' : 'Check inputs');
-  $('#api-status').className = `connection ${ok ? 'connected' : 'disconnected'}`;
-}
-
-async function run(kind) {
-  const form = $(`#${kind}-form`);
-  if (!form.reportValidity()) return;
-  const input = Object.fromEntries(new FormData(form));
-  for (const key of Object.keys(input)) if (!['region', 'formula'].includes(key)) input[key] = Number(input[key]);
-  const id = ++sequence;
-  clearResults('Updating example…');
-  $('#error-message').hidden = true;
-  $('.demo-output').setAttribute('aria-busy', 'true');
-  $('#calculation-status').textContent = 'Updating sample inputs…';
-  const button = form.querySelector('button[type=submit]');
-  button.disabled = true;
-  try {
-    const data = calculateDemo(kind, input);
-    if (id !== sequence || kind !== selected) return;
-    render(kind, data); cache.set(kind, { data, input }); connection(true);
-  } catch (error) {
-    if (id !== sequence || kind !== selected) return;
-    clearResults('No current result');
-    $('#error-message').hidden = false;
-    $('#error-message').textContent = error.message;
-    $('#calculation-status').textContent = 'Calculation not completed. Update the inputs or retry.';
-    if (!error.httpStatus || error.httpStatus >= 500) {
-      connection(false);
+function selectCell(label,focus=false){
+  const target=$('#model-table').querySelector('[data-cell="'+label+'"]');
+  if(!target)return;
+  selected=label;
+  $('#model-table').querySelectorAll('[data-cell]').forEach(cell=>{
+    cell.dataset.selected=String(cell.dataset.cell===label);
+    cell.tabIndex=cell.dataset.cell===label?0:-1;
+    cell.removeAttribute('data-referenced');
+  });
+  const cell=sheet().rows[Number(target.dataset.row)]?.[Number(target.dataset.col)]||{value:'',formula:''};
+  $('#model-address').textContent=label;
+  $('#model-formula').textContent=cell.formula||String(cell.value)||'Empty cell';
+  $('#model-cell-kind').textContent=cell.formula?'Formula':cell.value===''?'Empty':'Value';
+  $('#selection-note').textContent=sheetName+'!'+label+(cell.formula?' · Formula':' · Value');
+  if(cell.formula){
+    const refs=[...cell.formula.matchAll(/(?:([A-Za-z]+)!)?([A-D])(\d+)(?::([A-D])(\d+))?/g)];
+    for(const ref of refs){
+      if(ref[1]&&ref[1]!==sheetName)continue;
+      const startCol=letters.indexOf(ref[2]),endCol=letters.indexOf(ref[4]||ref[2]);
+      for(let row=Number(ref[3]);row<=Number(ref[5]||ref[3]);row++)for(let col=startCol;col<=endCol;col++){
+        const reference=$('#model-table').querySelector('[data-cell="'+letters[col]+row+'"]');
+        if(reference&&reference!==target)reference.dataset.referenced='true';
+      }
     }
-  } finally {
-    button.disabled = false;
-    if (id === sequence) $('.demo-output').setAttribute('aria-busy', 'false');
   }
+  if(focus)target.focus({preventScroll:true});
 }
-
-function selectDemo(kind) {
-  selected = kind; sequence++;
-  document.querySelectorAll('[data-demo]').forEach(button => { const on = button.dataset.demo === kind; button.setAttribute('aria-selected', String(on)); button.tabIndex = on ? 0 : -1; });
-  for (const name of Object.keys(defaults)) $(`#demo-${name}`).hidden = name !== kind;
-  $('#output-title').textContent = names[kind];
-  if (cache.has(kind)) { render(kind, cache.get(kind).data); $('.demo-output').setAttribute('aria-busy', 'false'); }
-  else run(kind);
+function renderModel(){
+  const state=current(),book=workbooks[kind];
+  $('#model-title').textContent=book.description;
+  $('#workbook-filename').textContent=book.file;
+  $('#model-caption').textContent=state.caption;
+  $('#model-view').setAttribute('aria-labelledby','tab-'+kind);
+  document.querySelectorAll('[data-workbook]').forEach(button=>{
+    const on=button.dataset.workbook===kind;
+    button.setAttribute('aria-selected',String(on));button.tabIndex=on?0:-1;
+  });
+  document.querySelectorAll('[data-snapshot]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.snapshot)===snapshotIndex)));
+  document.querySelectorAll('[data-sheet]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.sheet===sheetName)));
+  $('#model-metrics').innerHTML=state.highlights.map(([label,value,type])=>'<div><span>'+escape(label)+'</span><strong>'+escape(formatCell({value,format:type==='number'?'':'money'}))+'</strong></div>').join('');
+  renderTable();
 }
-
-document.querySelectorAll('[data-demo]').forEach(button => button.addEventListener('click', () => selectDemo(button.dataset.demo)));
-$('[role=tablist]').addEventListener('keydown', event => {
-  const tabs = [...document.querySelectorAll('[data-demo]')];
-  const i = tabs.indexOf(document.activeElement);
-  if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-  event.preventDefault();
-  const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (i + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-  tabs[next].focus(); selectDemo(tabs[next].dataset.demo);
+function selectWorkbook(next){
+  kind=next;snapshotIndex=0;sheetName=workbooks[kind].defaultSheet;selected=sheet().active;
+  makeChoices();renderModel();announce(workbooks[kind].title+'. '+current().label+'. '+sheetName+' sheet.');
+}
+document.querySelectorAll('[data-workbook]').forEach(button=>button.addEventListener('click',()=>selectWorkbook(button.dataset.workbook)));
+$('.model-choices').addEventListener('keydown',event=>{
+  const tabs=[...document.querySelectorAll('[data-workbook]')],index=tabs.indexOf(document.activeElement);
+  if(index<0||!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  event.preventDefault();const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(index+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;
+  selectWorkbook(tabs[next].dataset.workbook);tabs[next].focus();
 });
-
-for (const kind of Object.keys(defaults)) {
-  const form = $(`#${kind}-form`);
-  form.addEventListener('submit', event => { event.preventDefault(); run(kind); });
-  form.addEventListener('input', () => { cache.delete(kind); sequence++; if (kind === selected) { clearResults('Inputs changed. Run to recalculate.'); $('#calculation-status').textContent = 'Inputs changed · result needs recalculation'; $('.demo-output').setAttribute('aria-busy', 'false'); } });
-}
-document.querySelectorAll('[data-formula]').forEach(button => button.addEventListener('click', () => { $('#formula').value = button.dataset.formula; run('formula'); }));
-$('#reset').addEventListener('click', () => { $(`#${selected}-form`).reset(); run(selected); });
-$('#request-toggle').addEventListener('click', () => { const open = $('#request-code').hidden; $('#request-code').hidden = !open; $('#request-toggle').setAttribute('aria-expanded', String(open)); });
-$('#copy-code').addEventListener('click', async () => { try { await navigator.clipboard.writeText($('#integration-code').textContent); $('#copy-code').textContent = 'Copied ✓'; } catch { $('#copy-code').textContent = 'Select the code to copy'; } });
-run('revenue');
-
-// Illustrative integration paths. These labels do not simulate an agent run.
-const workflowStories = {
-  agent: ['An agent requests a scenario','Model inputs from a tool call','Calculated values return to the agent','Typed results with calculation diagnostics','YOUR TOOL → HTTP API → RESULTS','✳'],
-  etl: ['Fresh data arrives in your pipeline','Prepare the inputs in your existing data job','Calculated results continue downstream','Write to the next table, report or job step','PREPARE → CALCULATE → CONTINUE','≋'],
-  app: ['A user changes an assumption','Inputs from your planning or pricing interface','Your application shows the new outcome','Embed the browser SDK or call your backend','USER INPUT → CALCULATE → UPDATE UI','⌘']
-};
-document.querySelectorAll('[data-workflow]').forEach(button => button.addEventListener('click', () => {
-  const story=workflowStories[button.dataset.workflow];
-  ['#workflow-input','#workflow-input-note','#workflow-output','#workflow-output-note','#workflow-channel','#workflow-symbol'].forEach((selector,index)=>$(selector).textContent=story[index]);
-  document.querySelectorAll('[data-workflow]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
-}));
-document.querySelectorAll('[data-example-link]').forEach(link => link.addEventListener('click', () => {
-  if (link.closest('.model-bottom')) {
-    $('#revenue-form').reset();
-    $('#price').value = $('#hero-price').value;
-    cache.delete('revenue');
-  }
-  selectDemo(link.dataset.exampleLink);
-}));
-document.querySelectorAll('a[href="#workflow-details"],a[href="#server-details"],a[href="#compatibility"]').forEach(link=>link.addEventListener('click',()=>$(link.getAttribute('href')).open=true));
-
-// Direct manipulation of the same explicit sample model used by the full demo.
-const heroPrice = $('#hero-price');
-function updateHero() {
-  const price = Number(heroPrice.value);
-  const data = calculateDemo('revenue', {...defaults.revenue, price});
-  $('#hero-price-value').textContent = money(price);
-  $('#hero-revenue').textContent = money(data.revenue);
-  heroPrice.setAttribute('aria-valuetext', `${price} dollars per month`);
-  heroPrice.style.setProperty('--range-progress', `${(price - 29) / 70 * 100}%`);
-  // A fixed scale preserves the visible magnitude of a price change.
-  $('#hero-chart').innerHTML = data.rows.map(row => `<div class="hero-bar-group"><span class="hero-bar" style="height:${row.revenue / 180000 * 100}%"></span><span>${row.month}</span></div>`).join('');
-  $('#hero-chart').setAttribute('aria-label', `Sample monthly revenue: ${data.rows.map(row => `${row.month} ${money(row.revenue)}`).join(', ')}. Six-month total ${money(data.revenue)}.`);
-}
-heroPrice.addEventListener('input', updateHero);
-updateHero();
-
-function updatePresets() {
-  document.querySelectorAll('[data-formula]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.formula === $('#formula').value)));
-}
-document.querySelectorAll('[data-formula]').forEach(button => button.addEventListener('click', updatePresets));
-$('#reset').addEventListener('click', updatePresets);
-updatePresets();
+$('#model-scenarios').addEventListener('click',event=>{
+  const button=event.target.closest('[data-snapshot]');if(!button)return;
+  snapshotIndex=Number(button.dataset.snapshot);renderModel();announce(current().label+'. '+current().caption);
+});
+$('#model-sheets').addEventListener('click',event=>{
+  const button=event.target.closest('[data-sheet]');if(!button)return;
+  sheetName=button.dataset.sheet;selected=sheet().active;renderModel();announce(sheetName+' sheet. Select a cell to inspect its formula.');
+});
+$('#model-table').addEventListener('click',event=>{
+  const button=event.target.closest('[data-cell]');if(!button)return;
+  selectCell(button.dataset.cell);announce(sheetName+' '+selected+': '+$('#model-formula').textContent);
+});
+$('#model-table').addEventListener('keydown',event=>{
+  const button=event.target.closest('[data-cell]');if(!button)return;
+  const moves={ArrowLeft:[0,-1],ArrowRight:[0,1],ArrowUp:[-1,0],ArrowDown:[1,0]};
+  if(!moves[event.key]&&!['Home','End'].includes(event.key))return;
+  event.preventDefault();
+  const row=Number(button.dataset.row),col=Number(button.dataset.col),rowCount=Math.max(11,sheet().rows.length);
+  const nextRow=Math.max(0,Math.min(rowCount-1,row+(moves[event.key]?.[0]||0)));
+  const nextCol=event.key==='Home'?0:event.key==='End'?3:Math.max(0,Math.min(3,col+(moves[event.key]?.[1]||0)));
+  selectCell(address(nextRow,nextCol),true);
+});
+$('#model-reset').addEventListener('click',()=>{snapshotIndex=0;sheetName=workbooks[kind].defaultSheet;selected=sheet().active;renderModel();announce('View reset. '+workbooks[kind].title+'. Base scenario.');});
+document.querySelectorAll('[data-open-details]').forEach(link=>link.addEventListener('click',()=>$(link.getAttribute('href')).open=true));
+makeChoices();renderModel();

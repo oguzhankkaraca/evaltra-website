@@ -1,10 +1,10 @@
 {
-  "capturedAt": "2026-09-28T22:02:30.506Z",
+  "capturedAt": "2026-10-08T03:36:11.554Z",
   "excel": {
     "version": "16.0",
-    "build": 20326,
+    "build": 20430,
     "iteration": false,
-    "capturedAt": "2026-09-28T22:01:10.4968413Z"
+    "capturedAt": "2026-10-08T03:34:52.9790794Z"
   },
   "scope": "These fixtures only. Other engines represents a tested static-dependency engine, not every engine. Reference results are recorded, not live services.",
   "cases": {

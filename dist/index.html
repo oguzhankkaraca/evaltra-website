@@ -1,116 +1,78 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="en">
+<head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Evaltra — Your formulas. Everywhere you build.</title>
-<meta name="description" content="Bring spreadsheet business logic to AI agents, data pipelines and applications. Explore Evaltra, a headless Rust calculation engine, with interactive sample models.">
-<meta name="theme-color" content="#f5f5f7"><link rel="icon" href="./favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./headless.css"><script type="module" src="./app.js"></script>
-</head><body>
-<noscript><p class="noscript">Enable JavaScript to try the interactive examples. You can still explore the product information below.</p></noscript>
+<title>Evaltra — A calculation engine for your spreadsheets.</title>
+<meta name="description" content="Evaluate formulas, recalculate dependent cells and bring spreadsheet models into your applications. Evaltra libraries for WASM, Rust and Python.">
+<meta name="theme-color" content="#f5f5f7">
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./proof.css"><link rel="stylesheet" href="./headless.css">
+<script type="module" src="./app.js"></script>
+</head>
+<body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="header"><div class="wrap nav"><a class="brand" href="#" aria-label="Evaltra home"><img src="./favicon.svg" width="28" height="28" alt="">evaltra</a><nav aria-label="Main navigation"><a href="#use-cases">Workflows</a><a href="#runtime-graph">The engine</a><a href="#developers">Developers</a></nav><a class="nav-cta" href="#playground">Try the examples <span aria-hidden="true">↗</span></a></div></header>
+<header class="header"><div class="wrap nav">
+<a class="brand" href="#" aria-label="Evaltra home"><img src="./favicon.svg" width="28" height="28" alt="">evaltra</a>
+<nav aria-label="Main navigation"><a href="#runtime-graph">The engine</a><a href="#playground">Workbooks</a><a href="#developers">Libraries</a></nav>
+<a class="nav-cta" href="#playground">Explore the models <span aria-hidden="true">↗</span></a>
+</div></header>
 <main id="main">
-<section class="hero"><div class="wrap">
-  <p class="eyebrow">SPREADSHEET LOGIC. BEYOND THE SPREADSHEET.</p>
-  <h1>Your formulas.<br> <span>Everywhere you build.</span></h1>
-  <p class="hero-description">Bring the business logic your team knows<br class="desktop-break"> to the agents, pipelines and apps you build.</p>
-  <div class="hero-actions"><a class="button primary" href="#playground">Explore the examples <span aria-hidden="true">↗</span></a><a class="inline-link" href="#use-cases">See how it works <span aria-hidden="true">↓</span></a></div>
-  <div class="hero-model" aria-label="Interactive sample revenue model">
-    <div class="model-top"><span><span class="model-icon" aria-hidden="true">ƒx</span> Revenue model</span><span class="sample-badge">Interactive example</span></div>
-    <div class="model-content"><div class="model-input">
-      <p class="small-label">ONE INPUT. A NEW OUTLOOK.</p><h2>What if you<br> changed the price?</h2>
-      <div class="price-heading"><label for="hero-price">Monthly price</label><output id="hero-price-value" for="hero-price">$49</output></div>
-      <input id="hero-price" type="range" min="29" max="99" step="1" value="49" aria-valuetext="49 dollars per month">
-      <div class="range-labels" aria-hidden="true"><span>$29</span><span>$99</span></div>
-      <p class="input-hint">Slide to explore. Or use your arrow keys.</p>
-      <div class="model-assumptions"><span><b>1,200</b> starting customers</span><span><b>8%</b> monthly growth</span></div>
-    </div><div class="model-result"><div class="hero-result-heading"><div><p class="small-label">6-MONTH REVENUE</p><output id="hero-revenue" for="hero-price">$431,445</output></div><span class="model-period">Jan – Jun</span></div><div id="hero-chart" class="hero-chart" role="img" aria-label="Sample revenue from January to June"></div><p class="model-formula"><span aria-hidden="true">ƒx</span> Customers × monthly price</p></div></div>
-    <div class="model-bottom"><span>Illustrative model · synthetic data · no API connection</span><a href="#playground" data-example-link="revenue">Explore every input <span aria-hidden="true">↗</span></a></div>
-  </div>
-  <div class="hero-bottom"><span>One Rust calculation core.</span><div><span>Browser SDK</span><span>Native Rust</span><span>HTTP API</span></div></div>
-</div></section>
-<section class="section wrap use-cases" id="use-cases">
-  <div class="section-heading"><div><p class="eyebrow">WHERE YOUR MODEL GOES NEXT</p><h2>One model.<br> <span>More possibilities.</span></h2></div><p>Your formulas define the rules.<br> Evaltra makes them a calculation step<br class="desktop-break"> in the workflow you already own.</p></div>
-  <div class="workflow-preview"><div class="workflow-switch" role="group" aria-label="Explore a workflow"><button data-workflow="agent" aria-pressed="true">AI agents</button><button data-workflow="etl" aria-pressed="false">Data pipelines</button><button data-workflow="app" aria-pressed="false">Applications</button></div>
-    <div class="workflow-story" aria-live="polite"><div class="workflow-stop"><span class="step-index">01 / INPUT</span><span class="workflow-symbol" id="workflow-symbol" aria-hidden="true">✳</span><strong id="workflow-input">An agent requests a scenario</strong><small id="workflow-input-note">Model inputs from a tool call</small></div><span class="workflow-join" aria-hidden="true">→</span><div class="engine-stop"><span class="step-index">02 / CALCULATE</span><div class="engine-label"><img src="./favicon.svg" width="40" height="40" alt=""><strong>evaltra</strong></div><strong>Your existing workbook</strong><small>Formulas · rules · dependencies</small></div><span class="workflow-join" aria-hidden="true">→</span><div class="workflow-stop"><span class="step-index">03 / RESULT</span><span class="workflow-symbol" aria-hidden="true">↳</span><strong id="workflow-output">Calculated values return to the agent</strong><small id="workflow-output-note">Typed results with calculation diagnostics</small></div></div>
-    <div class="preview-footer"><span id="workflow-channel">YOUR TOOL → HTTP API → RESULTS</span><span>Integration pattern</span></div>
-  </div>
-</section>
-<section class="section wrap" id="playground">
-  <div class="section-heading"><div><div class="eyebrow">INTERACTIVE EXAMPLES</div><h2>A little change.<br> <span>A whole new perspective.</span></h2></div><p>Adjust a forecast, filter sales or explore a formula.<br> Start with an example. Make it your own.</p></div>
-  <div class="demo-shell">
-    <div class="demo-top"><div role="tablist" aria-label="Sample demos"><button role="tab" id="tab-revenue" aria-selected="true" aria-controls="demo-revenue" data-demo="revenue"><span>01</span> Revenue model</button><button role="tab" id="tab-sales" aria-selected="false" aria-controls="demo-sales" tabindex="-1" data-demo="sales"><span>02</span> Sales analytics</button><button role="tab" id="tab-formula" aria-selected="false" aria-controls="demo-formula" tabindex="-1" data-demo="formula"><span>03</span> Formula examples</button></div><span id="api-status" class="connection" role="status">Sample demo</span></div>
-    <div class="demo-body">
-      <div class="demo-controls">
-        <div role="tabpanel" id="demo-revenue" aria-labelledby="tab-revenue"><div class="panel-label">THE SCENARIO</div><h3>Your next six months.</h3><p>Explore how pricing and customer growth shape a subscription business.</p><form id="revenue-form">
-          <label for="customers">Starting customers</label><div class="input-wrap"><input id="customers" name="customers" type="number" value="1200" min="1" max="1000000" step="1" required><span>users</span></div>
-          <div class="input-row"><div><label for="price">Monthly price</label><div class="input-wrap"><span>$</span><input id="price" name="price" type="number" value="49" min="0" max="100000" step="0.01" required></div></div><div><label for="growth">Monthly growth</label><div class="input-wrap"><input id="growth" name="growth" type="number" value="8" min="0" max="100" step="0.1" required><span>%</span></div></div></div>
-          <label for="costs">Monthly operating costs</label><div class="input-wrap"><span>$</span><input id="costs" name="costs" type="number" value="18000" min="0" max="100000000" step="1" required></div>
-          <button class="button primary run" type="submit">Run model <span aria-hidden="true">↗</span></button>
-        </form></div>
-        <div role="tabpanel" id="demo-sales" aria-labelledby="tab-sales" hidden><div class="panel-label">THE SCENARIO</div><h3>Find the story in sales.</h3><p>Apply spreadsheet rules to a sample dataset—the calculation step in a data pipeline.</p><form id="sales-form"><label for="region">Sales region</label><select id="region" name="region"><option>North</option><option>South</option><option>East</option><option>West</option></select><label for="minimum">Minimum order value</label><div class="input-wrap"><span>$</span><input id="minimum" name="minimum" type="number" min="0" max="100000" value="5000" required></div><div class="formula-note"><span>FORMULAS AT WORK</span><code>SUMIFS · COUNTIFS<br> SUMIF · IFERROR</code></div><button class="button primary run" type="submit">Analyze sales <span aria-hidden="true">↗</span></button></form></div>
-        <div role="tabpanel" id="demo-formula" aria-labelledby="tab-formula" hidden><div class="panel-label">THE SCENARIO</div><h3>Four formulas to explore.</h3><p>Change A1, B1 and C1, then choose one of the four examples below. This preview supports these presets only.</p><form id="formula-form"><div class="formula-inputs"><div><label for="a">A1</label><input id="a" name="a" type="number" value="120" min="-1000000000" max="1000000000" step="any" required></div><div><label for="b">B1</label><input id="b" name="b" type="number" value="45" min="-1000000000" max="1000000000" step="any" required></div><div><label for="c">C1</label><input id="c" name="c" type="number" value="10" min="-1000000000" max="1000000000" step="any" required></div></div><label for="formula">Example formula</label><textarea id="formula" name="formula" rows="3" maxlength="500" readonly required spellcheck="false">=SUM(A1:C1)</textarea><div class="presets" aria-label="Example formulas"><button type="button" data-formula="=SUM(A1:C1)">SUM</button><button type="button" data-formula="=IF(A1>B1,&quot;Above target&quot;,&quot;Below target&quot;)">IF</button><button type="button" data-formula="=ROUND(A1/B1,2)">ROUND</button><button type="button" data-formula="=MAX(A1:C1)-MIN(A1:C1)">MAX / MIN</button></div><button class="button primary run" type="submit">Calculate <span aria-hidden="true">↗</span></button></form></div>
-        <p class="demo-disclaimer">Illustrative demo with synthetic data. No API connection.</p>
-      </div>
-      <div class="demo-output" aria-live="polite" aria-busy="true">
-        <div class="output-heading"><span id="output-title">REVENUE OVERVIEW</span><button id="reset" class="text-button" type="button">Reset inputs ↺</button></div>
-        <div id="error-message" class="error" role="alert" hidden></div>
-        <div id="metrics" class="metrics"><div><span>6-month revenue</span><strong>—</strong></div><div><span>6-month profit</span><strong>—</strong></div></div>
-        <div id="chart" class="chart" aria-label="Revenue chart"><span class="empty-state">Loading example…</span></div>
-        <div id="results-table" class="results-table"></div>
-        <div class="output-foot"><span id="calculation-status">Loading sample data…</span><button id="request-toggle" class="text-button" aria-expanded="false" aria-controls="request-code">View inputs <span aria-hidden="true">↗</span></button></div>
-        <pre id="request-code" hidden></pre>
-      </div>
-    </div>
-  </div>
-  <div class="playground-caption"><span>SAMPLE INPUTS → INTERACTIVE EXAMPLE → ILLUSTRATIVE RESULTS</span><a href="#quickstart">See how it connects <span aria-hidden="true">↓</span></a></div>
+<section class="hero wrap" aria-labelledby="hero-title">
+<p class="eyebrow library-eyebrow"><span>WASM</span><i aria-hidden="true"></i><span>RUST</span><i aria-hidden="true"></i><span>PYTHON</span></p>
+<h1 id="hero-title">A calculation engine<br><span>for your spreadsheets.</span></h1>
+<p class="hero-description">Evaluate formulas. Recalculate dependent cells.<br class="desktop-break"> Bring your workbook models into the software you build.</p>
+<div class="hero-actions"><a class="button primary" href="#runtime-graph">See how it calculates <span aria-hidden="true">↓</span></a><a class="button secondary" href="#developers">Explore the libraries <span aria-hidden="true">↗</span></a></div>
+<div class="hero-footnote"><span class="hero-mark" aria-hidden="true">ƒx</span> Your formulas. Inside your applications.</div>
 </section>
 
+<div class="soft-section"><section class="section wrap runtime-section" id="runtime-graph" aria-labelledby="runtime-title">
+<div class="section-heading runtime-heading"><div><p class="eyebrow">RUNTIME DEPENDENCIES</p><h2 id="runtime-title">An unused reference<br><span>shouldn’t block the result.</span></h2></div><p>A potential circular reference can stop a static dependency check. Evaltra follows the active branch and calculates the result.</p></div>
+<div id="dependency-demo"></div>
+<noscript><p class="noscript">For A1 = 0 and B1 = IF(A1,B1,42), Evaltra and Excel return 42. A static dependency check can report a circular reference in the unused branch. Enable JavaScript to explore the steps.</p></noscript>
+</section></div>
 
-
-<div class="soft-section"><section class="runtime-section section wrap" id="runtime-graph">
-  <div class="section-heading"><div><div class="eyebrow">RUNTIME DEPENDENCIES</div><h2>Calculation that<br> <span>follows your logic.</span></h2></div><p>Dependencies follow the calculation as it runs.<br> Conditional formulas can use the path they actually need.</p></div>
-  <div class="proof-layout"><div class="proof-intro"><span class="small-label">LOOK INSIDE A CALCULATION</span><h3>Only the path<br> the formula needs.</h3><p>This SUMIF selects one row and leaves a circular reference unused. Evaltra and Excel calculate it. A static dependency check can reject it.</p><a href="#runtime-demo" data-open-proof class="inline-link">Explore the example <span>↗</span></a></div><div class="proof-panel"><div class="comparison-workbook" id="runtime-demo">
-    <div class="workbook-toolbar"><div class="workbook-tabs" role="group" aria-label="Comparison example"><button data-scenario="sumif" aria-pressed="true">SUMIF</button><button data-scenario="if" aria-pressed="false">IF</button></div><button id="proof-run" class="grid-run">Replay example <span aria-hidden="true">↻</span></button></div>
-    <div class="workbook-formula"><span id="formula-address">A4</span><span aria-hidden="true">ƒx</span><code id="formula-expression">=SUMIF(B4:B5,1,C4:C5)</code></div>
-    <div id="proof-results" aria-live="polite" aria-busy="false">
-      <div class="engine-grid-scroll" tabindex="0" role="region" aria-label="Calculation comparison table. Scroll horizontally on small screens."><table class="engine-grid"><caption class="sr-only">Illustrative Evaltra values beside recorded Excel and static-dependency reference results.</caption><colgroup><col class="source-column"><col><col><col></colgroup><thead><tr><th scope="col">Cell / formula</th><th scope="col" class="evaltra-column">Evaltra<small>Example output</small></th><th scope="col">Excel<small>Verified reference</small></th><th scope="col">Other engines*<small>Static dependencies</small></th></tr></thead><tbody id="comparison-rows"></tbody></table></div>
-      <div class="workbook-status"><span id="proof-status" role="status">EXAMPLE RESULTS</span><span id="proof-match">Same formulas. Same inputs.</span></div>
-    </div>
-    <div id="proof-error" class="grid-error" role="alert" hidden></div>
-  </div>
-  <p class="comparison-explanation" id="comparison-explanation">SUMIF selects C4 = 7. The excluded row contains a reference back to the result, but it is never needed for this calculation.</p>
-  <p class="comparison-footnote">Static preview: Evaltra shows prepared example outputs; Excel and the static engine show recorded reference results. *One tested static-dependency example, not every engine.</p>
-  <details class="comparison-evidence"><summary>About these examples <span>+</span></summary><p id="reference-method">The Excel reference was recorded with iterative calculation disabled. This public preview uses prepared results and does not call the Evaltra engine.</p><p><a href="https://support.microsoft.com/en-us/excel/functions/sumif-function" target="_blank" rel="noreferrer">Microsoft's SUMIF reference ↗</a></p><pre id="proof-raw">Loading the example details…</pre></details>
-</div></div></section>
+<section class="section wrap models-section" id="playground" aria-labelledby="models-title">
+<div class="section-heading"><div><p class="eyebrow">THINK IN CELLS</p><h2 id="models-title">The workbook<br><span>is the model.</span></h2></div><p>Choose a scenario. Explore the sheets. Select a cell to see the formula behind its value.</p></div>
+<div class="model-choices" role="tablist" aria-label="Workbook examples"><button role="tab" id="tab-estimate" data-workbook="estimate" aria-selected="true" aria-controls="model-view">Project estimate</button><button role="tab" id="tab-sales" data-workbook="sales" aria-selected="false" aria-controls="model-view" tabindex="-1">Sales analysis</button></div>
+<div id="model-view" role="tabpanel" aria-labelledby="tab-estimate">
+<div class="model-intro"><h3 id="model-title">Three connected sheets. One project total.</h3><div class="scenario-choices" id="model-scenarios" role="group" aria-label="Workbook scenario"></div></div>
+<div class="workbook-card">
+<div class="workbook-top"><span><span class="file-symbol" aria-hidden="true">▦</span><strong id="workbook-filename">Project estimate.xlsx</strong></span><button id="model-reset" class="text-button">Reset view <span aria-hidden="true">↻</span></button></div>
+<div class="formula-bar"><span id="model-address" class="formula-address">D9</span><span class="fx" aria-hidden="true">ƒx</span><code id="model-formula">=SUM(D7:D8)</code><span id="model-cell-kind" class="cell-kind">Formula</span></div>
+<div class="sheet-scroll" role="region" aria-label="Workbook cells. Use arrow keys to move between cells." tabindex="0"><table class="sheet-table" id="model-table"><caption class="sr-only">Project estimate workbook</caption></table></div>
+<div class="sheet-footer"><div id="model-sheets" class="sheet-tabs" role="group" aria-label="Workbook sheets"></div><span class="selection-note" id="selection-note">Select a cell to explore</span></div>
 </div>
-<section class="section wrap" id="developers"><div class="section-heading"><div><p class="eyebrow">BUILT TO FIT</p><h2>At home<br> <span>in your stack.</span></h2></div><p>One calculation core. Different ways to use it.<br> Choose the interface that fits your application.</p></div><div class="runtime-options">
-  <article><span class="runtime-icon" aria-hidden="true">⌘</span><h3>In the browser.</h3><span class="runtime-kind">JavaScript / TypeScript SDK</span><p>Bring interactive planning and what-if experiences directly into your application.</p><a href="#quickstart">Explore the SDK <span aria-hidden="true">↗</span></a></article>
-  <article><span class="runtime-icon" aria-hidden="true">{ }</span><h3>On your server.</h3><span class="runtime-kind">Rust library / HTTP service</span><p>Embed the Rust core or call a service from agents, scheduled jobs and backends.</p><a href="#server-details">See the server interface <span aria-hidden="true">↗</span></a></article>
-  <article><span class="runtime-icon" aria-hidden="true">&gt;_</span><h3>From Python.</h3><span class="runtime-kind">HTTP today</span><p>Connect notebooks and batch jobs through HTTP. A native Python library is planned.</p><a href="#workflow-details">Explore integration <span aria-hidden="true">↗</span></a></article>
+<div class="model-bottom"><p id="model-caption"></p><div id="model-metrics" class="model-metrics"></div></div>
+<p id="model-announcement" class="sr-only" role="status"></p>
+</div>
+</section>
+
+<div class="soft-section"><section class="section wrap libraries-section" id="developers" aria-labelledby="libraries-title">
+<div class="section-heading"><div><p class="eyebrow">BUILD WITH EVALTRA</p><h2 id="libraries-title">One engine.<br><span>Three libraries.</span></h2></div><p>Use spreadsheet calculations where your application needs them, with the library that fits your stack.</p></div>
+<div class="library-grid">
+<article class="library-card"><div class="library-top"><span class="library-icon" aria-hidden="true">⌘</span><span class="library-tag">BROWSER</span></div><h3>WASM</h3><p>Bring workbook calculations into browser applications, planning tools and interactive product experiences.</p><div class="library-use">Web applications · Interactive models</div></article>
+<article class="library-card"><div class="library-top"><span class="library-icon" aria-hidden="true">{ }</span><span class="library-tag">NATIVE</span></div><h3>Rust</h3><p>Embed the calculation engine directly in native applications and services that work with spreadsheet models.</p><div class="library-use">Applications · Services · Systems</div></article>
+<article class="library-card"><div class="library-top"><span class="library-icon" aria-hidden="true">&gt;_</span><span class="library-tag">DATA &amp; AUTOMATION</span></div><h3>Python</h3><p>Put workbook logic to work in scripts, notebooks and data workflows with the Python library.</p><div class="library-use">Notebooks · Data jobs · Automation</div></article>
+</div>
+<div class="integration-flow" aria-label="Workbook calculation workflow"><span><b>01</b> Open a workbook</span><i aria-hidden="true">→</i><span><b>02</b> Change the inputs</span><i aria-hidden="true">→</i><span><b>03</b> Calculate</span><i aria-hidden="true">→</i><span><b>04</b> Read the results</span></div>
+</section></div>
+
+<section class="section wrap use-cases" id="use-cases" aria-labelledby="use-cases-title">
+<div class="section-heading"><div><p class="eyebrow">PUT THE MODEL TO WORK</p><h2 id="use-cases-title">Spreadsheet logic.<br><span>Application possibilities.</span></h2></div></div>
+<div class="use-case-grid">
+<article><span class="case-number">01 / APPLICATIONS</span><h3>Turn inputs into decisions.</h3><p>A pricing model, project estimate or planning workbook can become the calculation layer behind your interface.</p></article>
+<article><span class="case-number">02 / DATA WORKFLOWS</span><h3>Keep the formulas in the flow.</h3><p>Feed a workbook with new data, calculate its formulas and pass the resulting values into the next job.</p></article>
+<article><span class="case-number">03 / AGENT TOOLS</span><h3>Give an agent a model to use.</h3><p>Let your application map a tool call to workbook inputs, then return calculated values and diagnostics.</p></article>
+</div>
+</section>
+
+<section class="wrap faq-section" aria-labelledby="details-title"><div><p class="eyebrow">A CLOSER LOOK</p><h2 id="details-title">Built around<br><span>your formulas.</span></h2></div><div class="reference-details">
+<details id="calculation-details"><summary>What does Evaltra calculate?<span aria-hidden="true">+</span></summary><p>Evaltra evaluates supported spreadsheet formulas and recalculates dependent cells when inputs change. It handles the relationships between cells and sheets, so your application can work with the model’s results.</p></details>
+<details id="dependency-details"><summary>Why do runtime dependencies matter?<span aria-hidden="true">+</span></summary><p>A formula can contain a reference that its calculation never needs. In the IF example above, the false condition selects 42 and leaves the self-reference unused. Evaltra follows that active path. When a real circular dependency is active, it reports the cycle.</p></details>
+<details id="compatibility"><summary>Can I use an existing Excel workbook?<span aria-hidden="true">+</span></summary><p>Evaltra opens XLSX workbooks and calculates supported formulas. Validate the formulas and workbook features your application relies on before production use.</p><p>VBA and UDF execution, Power Query, automatic external-link refresh and iterative circular calculation are outside the runtime scope. Numeric compatibility and XLSX preservation have open work; successful import does not guarantee support for every workbook feature.</p></details>
+<details id="library-details"><summary>Which library should I choose?<span aria-hidden="true">+</span></summary><p>Use WASM for browser applications, Rust for native embedding, and Python for scripts, notebooks and data jobs. Choose the library that matches where your application runs and manages its workbooks.</p></details>
 </div></section>
-<section class="section wrap integration-section" id="quickstart"><div class="integration-intro"><div class="eyebrow">A FAMILIAR STARTING POINT</div><h2>Your workbook.<br> <span>Now part of your app.</span></h2><p>Open a supported workbook, update its inputs and read the results. Keep the formulas your team understands.</p><div class="integration-steps"><div><span>01</span> Open your model</div><div><span>02</span> Supply the inputs</div><div><span>03</span> Read calculated values</div></div><a class="inline-link" href="#compatibility">Check workbook compatibility <span>↗</span></a></div><div class="code-card"><div class="code-card-top"><span>JAVASCRIPT SDK / BROWSER</span><button class="text-button" id="copy-code">Copy code ⧉</button></div><pre id="integration-code">import { Evaltra } from &quot;@evaltra/engine&quot;;
-
-const engine = Evaltra.browser();
-
-try {
-  const book = await engine.open(workbookBytes);
-  await book.range(&quot;Inputs!B2&quot;)
-    .setCellContents([[59]]);
-  const result = await book
-    .range(&quot;Summary!B8&quot;).read();
-  console.log(result);
-} finally {
-  await engine.close();
-}</pre><p class="code-caption">Example for a workbook with Inputs and Summary sheets. Uses the locally built SDK package.</p></div></section>
-
-
-<section class="wrap faq-section" aria-label="Integration details"><div class="faq-heading"><div class="eyebrow">GOOD TO KNOW</div><h2>A few practical<br> <span>details.</span></h2></div><div class="reference-details"><details id="workflow-details"><summary>Where does Evaltra fit in an agent or ETL workflow?<span>+</span></summary><p>Your application maps a tool call or prepared dataset to model inputs, requests calculation and reads typed results and diagnostics. You control model access, orchestration and downstream actions.</p><p>A notebook, Databricks job or AWS Lambda function can be a client of the HTTP service where its runtime and network allow it. These are integration patterns; ready-made platform connectors and a native Python library are planned.</p></details><details id="server-details"><summary>How do I run it on a server?<span>+</span></summary><p>The native Rust executable exposes workbook sessions and isolated calculations through HTTP. The server does not require Node.js or Python at runtime. Keep the service token in your application backend; sessions and job results belong to one server process.</p><pre>EVALTRA_SERVICE_TOKEN=… ./evaltra-server
-
-POST /v1/sessions
-POST /v1/sessions/{id}/commands
-GET  /v1/jobs/{id}</pre></details><details id="compatibility"><summary>Can I use my existing Excel workbook?<span>+</span></summary><p>Evaltra opens XLSX workbooks and runs supported formulas with the same Rust core in native and browser environments. Validate your model's formulas and workbook features before production use.</p><p>VBA and UDF execution, Power Query, automatic external-link refresh and iterative circular calculation are outside the runtime scope. Numeric and XLSX preservation compatibility has open work; successful import is not a guarantee that every formula or feature is supported.</p></details><details><summary>How do these demos work?<span>+</span></summary><p>This website is a static preview. Revenue and sales examples use simple browser calculations on synthetic data. The formula section implements four presets, and the comparison table displays prepared example outputs alongside recorded reference results.</p><p>No Evaltra API or engine runs on this page. The integration examples describe how you can use the product in your own application.</p></details></div></section>
-
-<section class="closing"><div class="wrap"><p class="eyebrow">START WITH A SMALL CHANGE</p><h2>The logic is yours.<br> <span>See where it can go.</span></h2><a class="button primary" href="#playground">Explore the examples <span aria-hidden="true">↗</span></a></div></section>
-</main><footer class="wrap"><a class="brand" href="#" aria-label="Evaltra home"><img src="./favicon.svg" alt="" width="24" height="24">evaltra</a><span>Calculation, wherever work happens.</span><a href="#use-cases">Workflows</a><a href="#compatibility">Compatibility</a><small>© 2026 Evaltra</small></footer>
+<section class="closing"><div class="wrap"><p class="eyebrow">KEEP THE LOGIC YOU KNOW</p><h2>Your next application<br><span>can start with a workbook.</span></h2><a class="button primary" href="#playground">Explore the workbooks <span aria-hidden="true">↗</span></a></div></section>
+</main>
+<footer class="wrap"><a class="brand" href="#" aria-label="Evaltra home"><img src="./favicon.svg" alt="" width="24" height="24">evaltra</a><span>Calculation, wherever you build.</span><a href="#developers">Libraries</a><a href="#compatibility" data-open-details>Compatibility</a><small>© 2026 Evaltra</small><p class="trademark-note">Microsoft and Excel are trademarks of the Microsoft group of companies. Evaltra is an independent product.</p></footer>
 </body></html>

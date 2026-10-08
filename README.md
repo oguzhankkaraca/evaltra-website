@@ -1,6 +1,6 @@
 # Evaltra website
 
-Static product website and interactive sample demos. No backend, API key, engine binary, external JavaScript library or paid hosting is required.
+Product website with an animated dependency explanation and workbook walkthroughs. No backend, API key, engine binary, external JavaScript library or paid hosting is required.
 
 ## Preview and check
 
@@ -28,9 +28,11 @@ Edit the files in `dist/`, run the checks, and push to `main`. Public GitHub Pag
 
 ## Demo scope
 
-- Revenue: six illustrative months, computed using small JavaScript functions.
-- Sales: a fixed synthetic dataset with interactive filters.
-- Formula examples: four explicitly supported presets with editable numeric inputs. This is not a general formula parser or the Evaltra engine.
-- Dependency comparison: prepared Evaltra example outputs beside the existing Excel/static-engine reference file captured on 2026-09-28. Nothing is recalculated by those engines on the public site.
+- Project estimate: Inputs, Estimate and Summary sheets; base and expanded scenarios.
+- Sales analysis: Orders and Summary sheets; North, South and no-match scenarios, including FILTER spill output.
+- Selectable cells expose their formula or input. Scenario and sheet controls browse bounded workbook states; there is no arbitrary formula editor or parser.
+- All five workbook states were independently checked against native Evaltra and Excel on 2026-10-07 (America/New_York): 672 cells including every formula and spill result. The source model, raw outputs and binary hashes remain in ignored artifacts.
+- The IF/SUMIF comparison was refreshed on 2026-10-07 using Excel 16.0 build 20430 and the existing native engine binary. Internal evidence identifies the tested comparison implementation/version. These checks establish the displayed examples, not full workbook compatibility.
+- The dependency sequence is an explanatory animation with pause, replay and manual steps. It does not distribute or execute the Evaltra engine in the website.
 
 The public repository contains only reviewed static site files and publishing support. Local native service experiments, private artifacts, research notes and runtime files are excluded.
