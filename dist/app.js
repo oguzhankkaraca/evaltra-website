@@ -47,8 +47,10 @@ function render(kind, data) {
 }
 
 function clearResults(message = 'Choose an example…') {
+  $('#error-message').hidden = true;
   $('#metrics').innerHTML = metric('Result', '—') + metric('Execution', '—');
   $('#chart').className = 'chart';
+  $('#chart').setAttribute('aria-label', 'Example result');
   $('#chart').innerHTML = `<span class="empty-state">${escape(message)}</span>`;
   $('#results-table').innerHTML = '';
   $('#request-code').hidden = true;
@@ -135,5 +137,35 @@ document.querySelectorAll('[data-workflow]').forEach(button => button.addEventLi
   ['#workflow-input','#workflow-input-note','#workflow-output','#workflow-output-note','#workflow-channel','#workflow-symbol'].forEach((selector,index)=>$(selector).textContent=story[index]);
   document.querySelectorAll('[data-workflow]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
 }));
-document.querySelectorAll('[data-example-link]').forEach(link => link.addEventListener('click',()=>selectDemo(link.dataset.exampleLink)));
+document.querySelectorAll('[data-example-link]').forEach(link => link.addEventListener('click', () => {
+  if (link.closest('.model-bottom')) {
+    $('#revenue-form').reset();
+    $('#price').value = $('#hero-price').value;
+    cache.delete('revenue');
+  }
+  selectDemo(link.dataset.exampleLink);
+}));
 document.querySelectorAll('a[href="#workflow-details"],a[href="#server-details"],a[href="#compatibility"]').forEach(link=>link.addEventListener('click',()=>$(link.getAttribute('href')).open=true));
+
+// Direct manipulation of the same explicit sample model used by the full demo.
+const heroPrice = $('#hero-price');
+function updateHero() {
+  const price = Number(heroPrice.value);
+  const data = calculateDemo('revenue', {...defaults.revenue, price});
+  $('#hero-price-value').textContent = money(price);
+  $('#hero-revenue').textContent = money(data.revenue);
+  heroPrice.setAttribute('aria-valuetext', `${price} dollars per month`);
+  heroPrice.style.setProperty('--range-progress', `${(price - 29) / 70 * 100}%`);
+  // A fixed scale preserves the visible magnitude of a price change.
+  $('#hero-chart').innerHTML = data.rows.map(row => `<div class="hero-bar-group"><span class="hero-bar" style="height:${row.revenue / 180000 * 100}%"></span><span>${row.month}</span></div>`).join('');
+  $('#hero-chart').setAttribute('aria-label', `Sample monthly revenue: ${data.rows.map(row => `${row.month} ${money(row.revenue)}`).join(', ')}. Six-month total ${money(data.revenue)}.`);
+}
+heroPrice.addEventListener('input', updateHero);
+updateHero();
+
+function updatePresets() {
+  document.querySelectorAll('[data-formula]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.formula === $('#formula').value)));
+}
+document.querySelectorAll('[data-formula]').forEach(button => button.addEventListener('click', updatePresets));
+$('#reset').addEventListener('click', updatePresets);
+updatePresets();
